@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sam's Fruit Counter (By Harish)</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff7e6; max-width: 71vw;}
+h1 { text-align: center; color: #ffa500; margin-top: 20px; }
+.numberline-container { position: relative; width: 90%; max-width: 1000px; margin: 30px auto; height: 200px; background: #eaeaea; border-radius: 10px; border: 1px solid #ccc; }
+.house { position: absolute; height: 100%; background: rgba(231, 76, 60, 0.3); }
+.tree { position: absolute; top: 0; width: 20px; height: 100%; text-align: center; background: linear-gradient(#694b37, #804c2a, #85461d);}
+.apple-tree::after { content: "🍎"; font-size: 20px; display: block; margin-top: 0; }
+.orange-tree::after { content: "🍊"; font-size: 20px; display: block; margin-top: 0; }
+.fruit { position: absolute; bottom: 0; font-size: 20px; transition: all 0.5s; }
+.apple { color: #ff0000; }
+.orange { color: #ffa500; }
+.floating-container { position: fixed; top: 8px; right: 5px; width: 400px; height: 92vh; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden; }
+.floating-container h2 { margin: 0 0 10px 0; text-align: center; color: #ffa500; }
+.floating-container div { max-height: 620px; overflow-y: auto; padding-right: 5px; }
+.controls { display: flex; gap: 10px; max-width: 600px; margin: 20px auto; }
+.controls .labels { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.controls .inputs { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.controls label { margin-bottom: 10px; font-weight: bold; }
+.controls input { padding: 5px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+.updatenumberline { flex: 1 0 100%; padding-inline: 120px; padding-top: 8px; padding-bottom: 8px; margin-top: 3px; margin-left: 380px; background: #ffa500; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.updatenumberline:hover { background: #e89700; }
+.result { text-align: center; font-weight: bold; color: #2c3e50; margin-top: 5px; font-size: 18px; }
+.numberline-scale { background-color: #ffb23f; width: 90%; max-width: 1000px; margin: 0 auto 40px auto; position: relative; height: 30px; }
+.numberline-scale span { position: absolute; transform: translateX(-50%); margin-left: 22px; margin-top: 6px; font-size: 14px; }
+</style>
+</head>
+<body>
+<h1>Sam's Fruit Counter (By Harish)</h1>
+<div class="controls">
+  <div class="labels">
+    <label>House Start (s):</label>
+    <label>House End (t):</label>
+    <label>Apple Tree Position (a):</label>
+    <label>Orange Tree Position (b):</label>
+    <label>Apple Distances (comma separated):</label>
+    <label>Orange Distances (comma separated):</label>
+  </div>
+  <div class="inputs">
+    <input type="number" id="s">
+    <input type="number" id="t">
+    <input type="number" id="a">
+    <input type="number" id="b">
+    <input type="text" id="apples">
+    <input type="text" id="oranges">
+  </div>
+</div>
+  <button class="updatenumberline" onclick="updateNumberLine()">Update Number Line</button>
+</div>
+<div class="numberline-container" id="numberline"></div>
+<div class="numberline-scale" id="numberlineScale"></div>
+<div class="result" id="result"></div>
+<div class="floating-container">
+  <h2>Instructions</h2>
+  <div>
+  <p><strong>What is this web app about?</strong></p>
+    <p>This app calculates how many apples and oranges fall on Sam's house based on the positions of the house and trees and the distances fruits fall.</p>
+  <p><strong>Practical Use of This Concept:</strong></p>
+    <p>This problem demonstrates a simple example of <strong>coordinate mapping</strong> and <strong>range checking</strong> in programming, which is widely used in:</p>
+    <ul>
+      <li><strong>Game development:</strong> Detecting whether an object (like a character or projectile) lands in a specific area or hits a target.</li>
+      <li><strong>Simulations:</strong> Modeling real-world phenomena, such as rainfall landing on a plot, or traffic simulations where vehicles enter a zone.</li>
+      <li><strong>Physics/Engineering calculations:</strong> Determining if moving particles, objects, or forces intersect specific regions.</li>
+      <li><strong>Data visualization:</strong> Mapping numeric values to positions on a chart or number line, just like our fruits landing visually on the number line.</li>
+    </ul>
+  <p><strong>How to use:</strong></p>
+    <ul>
+      <li>Enter the <strong>start (s)</strong> and <strong>end (t)</strong> positions of Sam's house on a number line.</li>
+      <li>Enter the <strong>position of the apple tree (a)</strong> and <strong>orange tree (b)</strong>.</li>
+      <li>Enter the distances each apple and orange falls from its tree as comma-separated numbers.</li>
+      <li>Click <strong>"Update Number Line"</strong> to see the result visually.</li>
+    </ul>
+    <p><strong>Representation:</strong></p>
+    <ul>
+      <li><b>Apples</b> represented by 🍎</li>
+      <li><b>Oranges</b> represented by 🍊</li>
+      <li><b>Houses</b> represented by Red region on the container when output is obtained</li>
+    </ul>
+    <p><strong>Input guidelines:</strong></p>
+    <ul>
+      <li>House positions (s, t) and tree positions (a, b) must be integers.</li>
+      <li>Fruit distances can be positive (fall to the right) or negative (fall to the left).</li>
+      <li>Apple and orange distances should be entered as comma-separated integers (Advisable to give).</li>
+    </ul>
+    <p><strong>Output:</strong></p>
+    <ul>
+      <li>The result shows two numbers:</li>
+      <li><strong>Apples on house:</strong> Number of apples landing on the house.</li>
+      <li><strong>Oranges on house:</strong> Number of oranges landing on the house.</li>
+      <li>Output is inclusive of the house range [s, t].</li>
+    </ul>
+    <p><strong>Example:</strong></p>
+    <pre>
+      House Start (s): 7
+      House End (t): 11 
+      Apple Tree Position (a): 5
+      Orange Tree Position (b): 15
+      Apple Distances (comma separated): -2,2,1
+      Orange Distances (comma separated): 5,-6
+    </pre>
+    <p><strong>Result:</strong> Apples on house = 1, Oranges on house = 1</p>
+  </div>
+</div>
+<script>
+function updateNumberLine() {
+  const s = parseInt(document.getElementById('s').value);
+  const t = parseInt(document.getElementById('t').value);
+  const a = parseInt(document.getElementById('a').value);
+  const b = parseInt(document.getElementById('b').value);
+  const apples = document.getElementById('apples').value.split(',').map(x => parseInt(x.trim()));
+  const oranges = document.getElementById('oranges').value.split(',').map(x => parseInt(x.trim()));
+  const container = document.getElementById('numberline');
+  container.innerHTML = '';
+  const positions = [s, t, a, b, ...apples.map(x=>a+x), ...oranges.map(x=>b+x)];
+  const minPos = Math.floor(Math.min(...positions) - 2);
+  const maxPos = Math.ceil(Math.max(...positions) + 2);
+  const scale = container.clientWidth / (maxPos - minPos);
+  const houseDiv = document.createElement('div');
+  houseDiv.className = 'house';
+  houseDiv.style.left = ((s - minPos) * scale) + 'px';
+  houseDiv.style.width = ((t - s) * scale) + 'px';
+  container.appendChild(houseDiv);
+  const appleTreeDiv = document.createElement('div');
+  appleTreeDiv.className = 'tree apple-tree';
+  appleTreeDiv.style.left = ((a - minPos) * scale - 10) + 'px';
+  container.appendChild(appleTreeDiv);
+  const orangeTreeDiv = document.createElement('div');
+  orangeTreeDiv.className = 'tree orange-tree';
+  orangeTreeDiv.style.left = ((b - minPos) * scale - 10) + 'px';
+  container.appendChild(orangeTreeDiv);
+  let appleCount = 0;
+  apples.forEach(fruit => {
+    const landing = a + fruit;
+    if (landing >= s && landing <= t) appleCount++;
+    const fruitDiv = document.createElement('div');
+    fruitDiv.className = 'fruit apple';
+    fruitDiv.style.left = ((landing - minPos) * scale - 10) + 'px';
+    fruitDiv.innerText = '🍎';
+    container.appendChild(fruitDiv);
+  });
+  let orangeCount = 0;
+  oranges.forEach(fruit => {
+    const landing = b + fruit;
+    if (landing >= s && landing <= t) orangeCount++;
+    const fruitDiv = document.createElement('div');
+    fruitDiv.className = 'fruit orange';
+    fruitDiv.style.left = ((landing - minPos) * scale - 10) + 'px';
+    fruitDiv.innerText = '🍊';
+    container.appendChild(fruitDiv);
+  });
+  const scaleDiv = document.getElementById('numberlineScale');
+  scaleDiv.innerHTML = '';
+  const totalMarks = 10;
+  for (let i = 0; i <= totalMarks; i++) {
+    const num = minPos + i * (maxPos - minPos) / totalMarks;
+    const label = document.createElement('span');
+    label.style.left = ((num - minPos) * scale) + 'px';
+    label.innerText = Math.round(num);
+    scaleDiv.appendChild(label);
+  }
+  document.getElementById('result').innerHTML = `Apples on house: ${appleCount} &nbsp;&nbsp; Oranges on house: ${orangeCount}`;
+}
+updateNumberLine();
+</script>
+</body>
+</html>
