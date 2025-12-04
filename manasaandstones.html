@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manasa and Stones (By Harish)</title>
+<style>
+body{margin:0;padding:0;font-family:sans-serif;background:linear-gradient(135deg,#a8e6cf,#dcedc1);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;max-width: 47vw;}
+.container{background:rgba(255, 255, 255, 0);padding:30px;margin-top:40px;width:500px;text-align:center}
+h2{color:#ffffff;margin-bottom:20px; font-size: 35px;}
+input,button{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid #ccc;font-size:16px;outline:none}
+button{background:#2e7d32;color:white;border:none;cursor:pointer;font-weight:bold;}
+button:hover{background:#1b5e20}
+#result{margin-top:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.stone{background:#fff3e0;border:2px solid #ffb74d;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#ff6f00;box-shadow:0 5px 10px rgba(0,0,0,0.2)}
+.instructions-container{
+position:fixed;
+top:20px;
+right:20px;
+width:750px;
+height:650px;
+background:rgba(255,255,255,0.95);
+border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+padding:20px;
+overflow-y:auto;
+z-index:1000;
+font-family:sans-serif;
+color:#2e7d32;
+}
+
+.instructions-container h3{
+text-align:center;
+margin-bottom:15px;
+}
+
+.instructions-container h4{
+margin-top:15px;
+margin-bottom:5px;
+color:#1b5e20;
+}
+
+.instructions-container ul, .instructions-container ol{
+padding-left:20px;
+margin:5px 0 10px 0;
+}
+
+.instructions-container pre{
+background:#f1f8e9;
+padding:10px;
+border-radius:8px;
+overflow-x:auto;
+}
+</style>
+
+</head>
+<body>
+<div class="container">
+<h2>Manasa and Stones <br> (By Harish)</h2>
+<input type="number" id="stones" placeholder="Number of stones (n)" min="1">
+<input type="text" id="diffs" placeholder="Differences (comma-separated)">
+<button onclick="calculate()">Compute Last Stones</button>
+<div id="result"></div>
+</div>
+<div class="instructions-container">
+<div class="instructions">
+<h3>Instructions</h3>
+<h4>What is this web app about?</h4>
+<p>This app calculates all possible numbers that might appear on the last stone in a trail, based on the number of stones and the allowed differences between consecutive stones.</p>
+
+<h4>Practical Use of This Concept:</h4>
+<p>This problem demonstrates a simple example of combinatorial reasoning and sequence generation, which is widely used in:</p>
+<ul>
+<li><strong>Game development:</strong> Calculating possible moves or outcomes based on defined rules.</li>
+<li><strong>Simulations:</strong> Modeling paths, sequences, or scenarios with multiple possible outcomes.</li>
+<li><strong>Mathematics/Engineering calculations:</strong> Generating sequences with constraints, useful in probability and discrete mathematics.</li>
+<li><strong>Algorithm design:</strong> Teaching recursive and iterative computation of all possibilities for a given problem.</li>
+</ul>
+
+<h4>How to use:</h4>
+<ol>
+<li>Enter the number of stones (<code>n</code>).</li>
+<li>Enter the allowed differences between consecutive stones as comma-separated integers.</li>
+<li>Click “Compute Last Stones” to see all possible last stone values visually.</li>
+</ol>
+
+<h4>Representation:</h4>
+<ul>
+<li>Stones represented by round stone-like containers with numbers.</li>
+<li>Output stones display all unique possible values of the last stone.</li>
+</ul>
+
+<h4>Input guidelines:</h4>
+<ul>
+<li>Number of stones (<code>n</code>) must be a positive integer.</li>
+<li>Differences must be integers and can include more than two values (comma-separated).</li>
+</ul>
+
+<h4>Output:</h4>
+<ul>
+<li>Shows all possible last-stone numbers.</li>
+<li>Numbers are unique and sorted in ascending order.</li>
+</ul>
+
+<h4>Example:</h4>
+<pre>
+Number of stones (n): 3
+Allowed differences: 1,2
+
+Result: 2, 3, 4
+</pre>
+</div>
+</div>
+<script>
+function calculate(){
+let n=parseInt(document.getElementById('stones').value);
+let diffs=document.getElementById('diffs').value.split(',').map(Number).filter(x=>!isNaN(x));
+let results=new Set();
+function helper(index,current){
+if(index===n-1){results.add(current);return}
+for(let d of diffs){helper(index+1,current+d)}
+}
+helper(0,0);
+let container=document.getElementById('result');
+container.innerHTML='';
+[...results].sort((a,b)=>a-b).forEach(v=>{
+let div=document.createElement('div');
+div.className='stone';
+div.innerText=v;
+container.appendChild(div);
+})
+}
+</script>
+</body>
+</html>
