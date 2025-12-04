@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day Finder (By Harish)</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #e6f0ff; max-width: 70vw; }
+h1 { text-align: center; color: #0066cc; margin-top: 20px; }
+.controls { display: flex; gap: 10px; max-width: 600px; margin: 20px auto; }
+.controls .labels { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.controls .inputs { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.controls label { margin-bottom: 10px;font-size: 22px; font-weight: bold; color: #004080; }
+.controls input { padding: 5px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #004080; font-size: 17px; }
+.updatenumberline { font-size: 17px; padding: 10px 150px; margin-top: 3px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.updatenumberline:hover { background: #004080; }
+.result-container { width: 300px; height: 300px; background: #ffffff; border: 3px solid #004080; border-radius: 10px; margin: 30px auto; display: flex; justify-content: center; align-items: center; }
+.result-text { font-size: 33px; font-weight: bold; color: #004080; text-align: center; }
+.floating-container { position: fixed; top: 8px; right: 5px; width: 400px; height: 92vh; background: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden; }
+.floating-container h2 { font-size: 25px; margin: 0 0 10px 0; text-align: center; color: #0066cc; }
+.floating-container div { font-size: 17px; max-height: 620px; overflow-y: auto; padding-right: 5px; }
+</style>
+</head>
+<body>
+<br><br>
+<h1>Day Finder (By Harish)</h1>
+<br><br>
+<div class="controls">
+  <div class="labels">
+    <label>Year:</label>
+    <label>Day Number:</label>
+  </div>
+  <div class="inputs">
+    <input type="number" id="year" min="1700" max="2700" value="2023">
+    <input type="number" id="dayNumber" min="1" value="256">
+  </div>
+</div>
+<center><button class="updatenumberline" onclick="findDay()">Find Date</button></center>
+
+<div class="result-container">
+  <div class="result-text" id="result">--.--.----</div>
+</div>
+
+<div class="floating-container">
+<h2>Instructions</h2>
+<div>
+<p><strong>What is this web app about?</strong></p>
+<p>This app calculates the specific date of a given day number in a specified year according to Indian (Gregorian) calendar rules.</p>
+
+<p><strong>Why only 1700–2700?</strong></p>
+<p>The year range 1700–2700 is chosen because the Gregorian calendar rules used here are accurate and widely validated in this range. Beyond these years, calendar calculations may require astronomical adjustments which are not considered here.</p>
+
+<p><strong>Practical Use of this Concept:</strong></p>
+<ul>
+<li>Planning events or projects by knowing the exact date of a particular day number.</li>
+<li>Academic or scientific calculations that rely on day counts.</li>
+<li>Checking historical dates or deadlines in long-term planning.</li>
+</ul>
+
+<p><strong>Input Guidelines:</strong></p>
+<ul>
+<li>Year: Enter an integer between 1700 and 2700.</li>
+<li>Day Number: Enter an integer between 1 and 365 (366 for leap years).</li>
+</ul>
+
+<p><strong>How to use:</strong></p>
+<ul>
+<li>Enter the year and the day number.</li>
+<li>Click "Find Date" to get the exact date.</li>
+</ul>
+
+<p><strong>Output:</strong></p>
+<ul>
+<li>The result will be displayed in <strong>dd.mm.yyyy</strong> format in the square container above.</li>
+</ul>
+
+<p><strong>Example:</strong></p>
+<ul>
+<li>Year: 2016, Day Number: 256 → Output: 12.09.2016</li>
+<li>Year: 2023, Day Number: 100 → Output: 10.04.2023</li>
+</ul>
+</div>
+</div>
+
+<script>
+function isLeapYear(year){
+    return (year % 400 === 0) || (year % 4 === 0 && year % 100 !== 0);
+}
+
+function findDay(){
+    const y = parseInt(document.getElementById('year').value);
+    let dayNum = parseInt(document.getElementById('dayNumber').value);
+    let maxDay = isLeapYear(y) ? 366 : 365;
+    if(y<1700 || y>2700 || dayNum<1 || dayNum>maxDay){ alert("Invalid input"); return; }
+
+    let feb = isLeapYear(y) ? 29 : 28;
+    const monthDays = [31,feb,31,30,31,30,31,31,30,31,30,31];
+
+    let month = 0;
+    let day = dayNum;
+    for(let i=0;i<12;i++){
+        if(day>monthDays[i]) day-=monthDays[i];
+        else { month=i+1; break; }
+    }
+
+    const dd = day.toString().padStart(2,'0');
+    const mm = month.toString().padStart(2,'0');
+    document.getElementById('result').innerText = `${dd}.${mm}.${y}`;
+}
+</script>
+</body>
+</html>
