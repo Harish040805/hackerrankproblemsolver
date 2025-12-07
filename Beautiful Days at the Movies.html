@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beautiful Days at the Movies (By Harish)</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #ffe6fd; max-width: 71vw;}
+h1 { text-align: center; color: #ff009d; margin-top: 20px; }
+.numberline-container { position: relative; width: 90%; max-width: 1000px; margin: 30px auto; height: 200px; background: #eaeaea; border-radius: 10px; border: 1px solid #ccc; }
+.house { position: absolute; height: 100%; background: rgba(231, 76, 60, 0.3); }
+.tree { position: absolute; top: 0; width: 20px; height: 100%; text-align: center; background: linear-gradient(#694b37, #804c2a, #85461d);}
+.apple-tree::after { content: "🍎"; font-size: 20px; display: block; margin-top: 0; }
+.orange-tree::after { content: "🍊"; font-size: 20px; display: block; margin-top: 0; }
+.fruit { position: absolute; bottom: 0; font-size: 20px; transition: all 0.5s; }
+.apple { color: #ff0000; }
+.orange { color: #ffa500; }
+.floating-container { position: fixed; top: 8px; right: 5px; width: 400px; height: 92vh; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden; }
+.floating-container h2 { margin: 0 0 10px 0; text-align: center; color: #ff009d; }
+.floating-container div { max-height: 620px; overflow-y: auto; padding-right: 5px; }
+.controls { display: flex; gap: 10px; max-width: 600px; margin: 20px auto; }
+.controls .labels { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.controls .inputs { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.controls label { margin-bottom: 10px; font-weight: bold; }
+.controls input { padding: 5px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+.updatenumberline { flex: 1 0 100%; padding-inline: 120px; padding-top: 8px; padding-bottom: 8px; margin-top: 3px; margin-left: 380px; background: #ff00d9; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.updatenumberline:hover { background: #e800be; }
+.result { text-align: center; font-weight: bold; color: #2c3e50; margin-top: 5px; font-size: 18px; }
+.numberline-scale { background-color: #ff3fe2; width: 90%; max-width: 1000px; margin: 0 auto 40px auto; position: relative; height: 30px; }
+.numberline-scale span { position: absolute; transform: translateX(-50%); margin-left: 22px; margin-top: 6px; font-size: 14px; }
+</style>
+</head>
+<body>
+<h1>Beautiful Days at the Movies (By Harish)</h1>
+
+<div class="controls">
+  <div class="labels">
+    <label>Start Day (i):</label>
+    <label>End Day (j):</label>
+    <label>Divisor (k):</label>
+  </div>
+
+  <div class="inputs">
+    <input type="number" id="i">
+    <input type="number" id="j">
+    <input type="number" id="k">
+  </div>
+</div>
+
+<button class="updatenumberline" onclick="calculateBeautifulDays()">Check Beautiful Days</button>
+
+<div class="numberline-container" id="numberline"></div>
+<div class="numberline-scale" id="numberlineScale"></div>
+<div class="result" id="result"></div>
+
+<div class="floating-container">
+  <h2>Instructions</h2>
+  <div>
+    <p><strong>What is this web app about?</strong></p>
+    <p>This app determines how many "Beautiful Days" exist between the given range. A beautiful day is one where the absolute difference between the day number and its reverse is divisible by a divisor k.</p>
+
+    <p><strong>Practical Use of This Concept:</strong></p>
+    <ul>
+      <li>Useful in learning digit manipulation.</li>
+      <li>Helps understand divisibility and numerical symmetry.</li>
+      <li>Used in coding tests to assess loop and math logic.</li>
+    </ul>
+
+    <p><strong>How to use:</strong></p>
+    <ul>
+      <li>Enter start day (i).</li>
+      <li>Enter end day (j).</li>
+      <li>Enter divisor (k).</li>
+      <li>Click "Check Beautiful Days".</li>
+    </ul>
+
+    <p><strong>Input Guidelines:</strong></p>
+    <ul>
+      <li>i, j, and k must be integers.</li>
+      <li>i ≤ j.</li>
+    </ul>
+
+    <p><strong>Output:</strong></p>
+    <ul>
+      <li>Shows total number of Beautiful Days.</li>
+      <li>Visual number line with beautiful days highlighted.</li>
+    </ul>
+
+    <p><strong>Example:</strong></p>
+    <pre>
+i = 20
+j = 23
+k = 6
+Beautiful days = 2
+    </pre>
+  </div>
+</div>
+
+<script>
+function reverseNum(n) { return Number(n.toString().split('').reverse().join('')); }
+
+function calculateBeautifulDays() {
+  let i = Number(document.getElementById('i').value);
+  let j = Number(document.getElementById('j').value);
+  let k = Number(document.getElementById('k').value);
+
+  let container = document.getElementById("numberline");
+  let scale = document.getElementById("numberlineScale");
+  container.innerHTML = "";
+  scale.innerHTML = "";
+
+  if (!i || !j || !k || i > j) {
+    document.getElementById("result").innerHTML = "Enter valid inputs.";
+    return;
+  }
+
+  let total = j - i + 1;
+  let gap = 100 / total;
+
+  let count = 0;
+
+  for (let day = i; day <= j; day++) {
+    let rev = reverseNum(day);
+    let diff = Math.abs(day - rev);
+    let isBeautiful = diff % k === 0;
+
+    let marker = document.createElement("div");
+    marker.style.position = "absolute";
+    marker.style.bottom = "10px";
+    marker.style.left = ((day - i) * gap) + "%";
+    marker.style.transform = "translateX(-50%)";
+    marker.style.fontSize = "20px";
+    marker.style.color = isBeautiful ? "#ff009d" : "#000";
+    marker.innerHTML = isBeautiful ? "💖" : "•";
+    container.appendChild(marker);
+
+    let label = document.createElement("span");
+    label.style.left = ((day - i) * gap) + "%";
+    label.innerHTML = day;
+    scale.appendChild(label);
+
+    if (isBeautiful) count++;
+  }
+
+  document.getElementById("result").innerHTML =
+    "Beautiful Days Found: <span style='color:#ff009d; font-size:22px;'>" + count + "</span>";
+}
+</script>
+
+</body>
+</html>
