@@ -8,13 +8,6 @@
 body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #ffe6fd; max-width: 71vw;}
 h1 { text-align: center; color: #ff009d; margin-top: 20px; }
 .numberline-container { position: relative; width: 90%; max-width: 1000px; margin: 30px auto; height: 200px; background: #eaeaea; border-radius: 10px; border: 1px solid #ccc; }
-.house { position: absolute; height: 100%; background: rgba(231, 76, 60, 0.3); }
-.tree { position: absolute; top: 0; width: 20px; height: 100%; text-align: center; background: linear-gradient(#694b37, #804c2a, #85461d);}
-.apple-tree::after { content: "🍎"; font-size: 20px; display: block; margin-top: 0; }
-.orange-tree::after { content: "🍊"; font-size: 20px; display: block; margin-top: 0; }
-.fruit { position: absolute; bottom: 0; font-size: 20px; transition: all 0.5s; }
-.apple { color: #ff0000; }
-.orange { color: #ffa500; }
 .floating-container { position: fixed; top: 8px; right: 5px; width: 400px; height: 92vh; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; overflow: hidden; }
 .floating-container h2 { margin: 0 0 10px 0; text-align: center; color: #ff009d; }
 .floating-container div { max-height: 620px; overflow-y: auto; padding-right: 5px; }
@@ -23,11 +16,7 @@ h1 { text-align: center; color: #ff009d; margin-top: 20px; }
 .controls .inputs { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 .controls label { margin-bottom: 10px; font-weight: bold; }
 .controls input { padding: 5px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
-.updatenumberline { flex: 1 0 100%; padding-inline: 120px; padding-top: 8px; padding-bottom: 8px; margin-top: 3px; margin-left: 380px; background: #ff00d9; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-.updatenumberline:hover { background: #e800be; }
 .result { text-align: center; font-weight: bold; color: #2c3e50; margin-top: 5px; font-size: 18px; }
-.numberline-scale { background-color: #ff3fe2; width: 90%; max-width: 1000px; margin: 0 auto 40px auto; position: relative; height: 30px; }
-.numberline-scale span { position: absolute; transform: translateX(-50%); margin-left: 22px; margin-top: 6px; font-size: 14px; }
 </style>
 </head>
 <body>
@@ -149,3 +138,4 @@ function calculateBeautifulDays() {
 
 </body>
 </html>
+
