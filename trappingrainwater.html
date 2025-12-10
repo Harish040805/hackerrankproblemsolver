@@ -3,70 +3,79 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Interactive Rain Water Trapping Simulator</title>
+<title>Trapping Rain Water</title>
 <style>
-    body, html {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(to bottom, #999, #aaa, #ccc, #bbb);
-        overflow: hidden;
-    }
-    #controls {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: rgba(255,255,255,0.9);
-        padding: 10px;
-        border-radius: 8px;
-        z-index: 10;
-    }
-    #controls input {
-        width: 200px;
-        margin-bottom: 5px;
-        padding: 5px;
-    }
-    #controls button {
-        padding: 5px 10px;
-        cursor: pointer;
-    }
-    canvas {
-        display: block;
-    }
+    body, html { margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; background: linear-gradient(to bottom, #acacca, #aaa, #ccc, #999);
+        overflow: hidden; }
+    #controls { position: absolute; top: 10px; left: 70px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 8px; z-index: 10; }
+    #controls input { width: 200px; margin-bottom: 5px; padding: 5px; }
+    #controls button { padding: 5px 10px; cursor: pointer; background-color: #acacca; color: rgb(240, 241, 255); border: none; padding: 10px;}
+    canvas { display: block; }
+    #output { margin-top:5px;font-weight:bold; }
+    div::-webkit-scrollbar { display: none; }
+    .pl{ padding-left: 20px; }
+    .aboveall{ position:absolute; top:10px; right:10px; height:600px; width:330px; background:white; padding:15px; border-radius:10px; 
+        box-shadow:0 0 10px rgba(0,0,0,0.3); font-family:Arial; font-size:14px; z-index:20; line-height:1.5; overflow-y:auto; }
 </style>
 </head>
 <body>
-
+    <div class="aboveall">
+    <h3 style="margin-top:0;">About</h3>
+    <p> 
+        This web app visually shows how much <b>rain water</b> gets trapped between bars of different heights.
+        When you enter a series of heights, the graph will display the bars and the water collected between them.
+    </p>
+    <h3>Practical Use</h3>
+    <ul class="pl">
+        <li>Helps understand the famous “Rain Water Trapping” problem used in coding interviews.</li>
+        <li>Great for students learning arrays, graphs, and simulation-based algorithms.</li>
+        <li>Useful for visualizing how barriers store water in real scenarios (tanks, walls, elevation maps).</li>
+    </ul>
+    <h3>Input Format</h3>
+    <p>
+        Enter the heights as a <b>comma-separated list</b> of numbers.<br>
+        Example: <code>0,1,0,2,1,0,1,3,2,1,2,1</code>
+    </p>
+    <p>
+        Correct Inputs:<br><code>3,0,2,0,4</code><br><code>1,2,1</code><br><code>5,4,1,2</code>
+    </p>
+    <p>
+        Incorrect Inputs:<br><code>3 0 2 0 4</code> (spaces but no commas)<br><code>a,b,c</code> (letters are not allowed)<br><code>3,,4</code> (empty values)
+    </p>
+    <h3>How to Use</h3>
+    <ol class="pl">
+        <li>Enter the heights in the input box on the right.</li>
+        <li>Click <b>“Simulate Rainfall”</b>.</li>
+        <li>The bars will appear on the graph.</li>
+        <li>Blue shaded regions show the <b>trapped water</b>.</li>
+    </ol>
+    <h3>Output</h3>
+    <p> The total amount of trapped water will appear as a number:<br> Example: <b>Total Trapped Water: 6</b></p>
+    <p> You will also see the trapped water's exact position on the graph as transparent blue bars above the walls.</p>
+    <h3>Output Format</h3>
+    <p>
+        <b>Text Output:</b>  
+        <code>Total Trapped Water: X</code><br><br>
+        <b>Graphical Output:</b><br>
+        • Solid blue bars = wall heights  
+        • Light blue transparent bars = trapped water  
+    </p>
+</div>
 <div id="controls">
     <label>Enter heights (comma separated):</label><br>
-    <input type="text" id="heightInput" placeholder="e.g., 0,1,0,2,1,0,1,3,2,1,2,1"><br>
+    <input type="text" id="heightInput" placeholder="e.g., 0,1,0,2,1,0,1,3,2,1,2,1" autocomplete="new-password"><br>
     <button id="simulateBtn">Simulate Rainfall</button>
-    <div id="output" style="margin-top:5px;font-weight:bold;"></div>
+    <div id="output"></div>
 </div>
-
 <canvas id="canvas"></canvas>
-
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-
-let heights = [];
-let waterArray = [];
-let totalWater = 0;
-let scale = 20; // pixels per unit height
-let offsetX = 50;
-let offsetY = 50;
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
+const canvas = document.getElementById('canvas'); const ctx = canvas.getContext('2d');
+let heights = []; let waterArray = []; let totalWater = 0; let scale = 20; let offsetX = 50; let offsetY = 50;
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
 window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
     drawGraph();
 });
-
 document.getElementById('simulateBtn').addEventListener('click', () => {
     const input = document.getElementById('heightInput').value;
     heights = input.split(',').map(Number);
@@ -76,26 +85,18 @@ document.getElementById('simulateBtn').addEventListener('click', () => {
     document.getElementById('output').innerText = `Total Trapped Water: ${totalWater}`;
     drawGraph();
 });
-
 function trap(height) {
     if (!height || height.length === 0) return { total: 0, waterArray: [] };
-    const n = height.length;
-    const leftMax = new Array(n).fill(0);
-    const rightMax = new Array(n).fill(0);
+    const n = height.length; const leftMax = new Array(n).fill(0); const rightMax = new Array(n).fill(0);
     leftMax[0] = height[0];
     for (let i = 1; i < n; i++) leftMax[i] = Math.max(leftMax[i-1], height[i]);
     rightMax[n-1] = height[n-1];
     for (let i = n-2; i >=0; i--) rightMax[i] = Math.max(rightMax[i+1], height[i]);
     const waterArr = new Array(n).fill(0);
     let water = 0;
-    for (let i=0;i<n;i++){
-        waterArr[i] = Math.min(leftMax[i], rightMax[i]) - height[i];
-        if(waterArr[i]>0) water += waterArr[i];
-    }
+    for (let i=0;i<n;i++){ waterArr[i] = Math.min(leftMax[i], rightMax[i]) - height[i]; if(waterArr[i]>0) water += waterArr[i]; }
     return { total: water, waterArray: waterArr };
 }
-
-// Zoom with mouse wheel
 canvas.addEventListener('wheel', e => {
     e.preventDefault();
     const delta = e.deltaY < 0 ? 1.1 : 0.9;
@@ -103,69 +104,36 @@ canvas.addEventListener('wheel', e => {
     scale = Math.max(5, Math.min(scale, 100));
     drawGraph();
 });
-
-// Draw axes and bars
 function drawGraph() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    drawAxes();
-    drawBars();
+    ctx.clearRect(0,0,canvas.width,canvas.height); drawAxes(); drawBars();
 }
-
 function drawAxes() {
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    // y-axis
-    ctx.beginPath();
-    ctx.moveTo(offsetX, offsetY);
-    ctx.lineTo(offsetX, canvas.height - offsetY);
-    ctx.stroke();
-    // x-axis
-    ctx.beginPath();
-    ctx.moveTo(offsetX, canvas.height - offsetY);
-    ctx.lineTo(canvas.width - offsetX, canvas.height - offsetY);
-    ctx.stroke();
-
-    // dynamic ticks
-    ctx.fillStyle = '#fff';
-    ctx.font = '12px Arial';
-    // y ticks
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(offsetX, offsetY); ctx.lineTo(offsetX, canvas.height - offsetY);
+    ctx.stroke(); ctx.beginPath(); ctx.moveTo(offsetX, canvas.height - offsetY); ctx.lineTo(canvas.width - offsetX, canvas.height - offsetY);
+    ctx.stroke(); ctx.fillStyle = '#0000ff'; ctx.font = '12px Arial';
     for (let y = 0; y <= (canvas.height - 2*offsetY)/scale; y++) {
-        const py = canvas.height - offsetY - y*scale;
-        ctx.beginPath();
-        ctx.moveTo(offsetX-5, py);
-        ctx.lineTo(offsetX+5, py);
-        ctx.stroke();
-        ctx.fillText(y, 5, py+3);
+       const py = canvas.height - offsetY - y*scale; ctx.beginPath(); ctx.moveTo(offsetX-5, py); ctx.lineTo(offsetX+5, py); ctx.stroke(); ctx.fillText(y, 5, py+3);
     }
-    // x ticks
     for (let x=0; x<=(canvas.width - 2*offsetX)/scale; x++) {
-        const px = offsetX + x*scale;
-        ctx.beginPath();
-        ctx.moveTo(px, canvas.height - offsetY-5);
-        ctx.lineTo(px, canvas.height - offsetY+5);
-        ctx.stroke();
-        ctx.fillText(x, px-5, canvas.height - offsetY + 20);
+        const px = offsetX + x*scale; ctx.beginPath(); ctx.moveTo(px, canvas.height - offsetY-5); ctx.lineTo(px, canvas.height - offsetY+5);
+        ctx.stroke(); ctx.fillText(x, px-5, canvas.height - offsetY + 20);
     }
 }
-
 function drawBars() {
     if(!heights.length) return;
     for(let i=0;i<heights.length;i++){
         const barHeight = heights[i]*scale;
         const x = offsetX + i*scale;
         const y = canvas.height - offsetY - barHeight;
-        // bar
         ctx.fillStyle = '#3498db';
         ctx.fillRect(x, y, scale*0.8, barHeight);
-        // water
-        if(waterArray[i]>0){
-            const waterHeight = waterArray[i]*scale;
-            ctx.fillStyle = 'rgba(52, 152, 219, 0.5)';
+        if(waterArray[i]>0){ 
+            const waterHeight = waterArray[i]*scale; 
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.5)'; 
             ctx.fillRect(x, y - waterHeight, scale*0.8, waterHeight);
         }
     }
 }
 </script>
-
 </body>
 </html>
