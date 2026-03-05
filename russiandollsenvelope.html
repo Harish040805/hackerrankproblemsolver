@@ -4,234 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Russian Doll Envelopes</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: grid;
-            grid-template-columns: 220px 1fr; /* Sidebar width and main content */
-            gap: 20px;
-            padding: 20px;
-            margin: 0;
-            color: #333;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-      .sidebar {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-            height: fit-content; /* Adjust height to content */
-        }
-      .main-content {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            box-sizing: border-box;
-        }
-        h2 {
-            color: #007bff;
-            margin-bottom: 10px;
-            font-size: 1.5em;
-        }
-        p {
-            color: #666;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-      .control-group {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 10px; /* Space between groups */
-        }
-      .control-group label {
-            font-weight: bold;
-            color: #555;
-            font-size: 0.9em;
-        }
-      .control-group input[type="number"] {
-            padding: 8px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            width: 80px;
-            text-align: center;
-        }
-      .sidebar button {
-            width: 90%;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            margin-top: 1px; /* Space between buttons */
-        }
-        #generateBtn {
-            background-color: #28a745;
-            color: white;
-        }
-        #generateBtn:hover {
-            background-color: #218838;
-            transform: translateY(-1px);
-        }
-        #solveBtn {
-            background-color: #007bff;
-            color: white;
-        }
-        #solveBtn:hover:not(:disabled) {
-            background-color: #0056b3;
-            transform: translateY(-1px);
-        }
-        #solveBtn:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        #resetBtn {
-            background-color: #dc3545;
-            color: white;
-        }
-        #resetBtn:hover {
-            background-color: #c82333;
-            transform: translateY(-1px);
-        }
-      .results {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e6f2ff;
-            border: 1px solid #cce0ff;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #0056b3;
-        }
-      .results span {
-            color: #003366;
-        }
-        #envelopePool {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            min-height: 100px;
-            padding: 20px;
-            border: 2px dashed #a7d9ff;
-            background-color: #f8fbff;
-            border-radius: 10px;
-            margin-top: 20px;
-            box-sizing: border-box;
-        }
-        #nestingArea {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 150px;
-            padding: 20px;
-            border: 2px dashed #ccc;
-            background-color: #fcfcfc;
-            border-radius: 10px;
-            margin-top: 20px;
-            box-sizing: border-box;
-            position: relative;
-            justify-content: flex-end;
-            min-width: 150px; /* Ensure nesting area isn't too small */
-        }
-        #nestingArea.drag-over {
-            border-color: #007bff;
-            background-color: #e6f2ff;
-        }
-      .envelope-item {
-            background-color: #ffcc00;
-            border: 1px solid #e6b800;
-            position: relative;
-            box-sizing: border-box;
-            cursor: grab;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.8em;
-            font-weight: bold;
-            color: #333;
-            border-radius: 3px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: all 0.1s ease;
-        }
-      .envelope-item:active {
-            cursor: grabbing;
-        }
-      .envelope-item.dragging {
-            opacity: 0.6;
-            border: 2px dashed #007bff;
-            background-color: #a4d2ff;
-            z-index: 1000;
-        }
-      .envelope-item.nested {
-            margin: -10px auto 0;
-            position: relative;
-            background-color: #4CAF50;
-            border-color: #388E3C;
-            color: white;
-            cursor: default;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-      .envelope-item.optimal {
-            background-color: #17a2b8!important;
-            border-color: #138496!important;
-            color: #fff!important;
-            box-shadow: 0 0 0 4px rgba(23, 162, 184, 0.5)!important;
-            transform: scale(1.05);
-            z-index: 100;
-        }
-      .highlight-fit {
-            border: 2px solid #28a745!important;
-            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
-        }
-      .highlight-no-fit {
-            border: 2px solid #dc3545!important;
-            box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
-        }
-       @media (max-width: 768px) {
-            body {
-                grid-template-columns: 1fr;
-                gap: 15px;
-                padding: 15px;
-            }
-          .sidebar {
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 10px;
-                padding: 15px;
-            }
-          .control-group {
-                flex-direction: row;
-                justify-content: center;
-                margin-bottom: 0;
-            }
-          .sidebar button {
-                width: auto;
-                flex-grow: 1;
-                margin-top: 0;
-            }
-          .main-content {
-                padding: 20px;
-            }
-          .results {
-                font-size: 1em;
-            }
-        }
-    </style>
+<style>
+    body { font-family: Arial, sans-serif; background-color: #f0f2f5; display: grid; grid-template-columns: 220px 1fr; gap: 20px; padding: 20px; margin: 0; 
+            color: #333; min-height: 100vh; box-sizing: border-box; }
+    .sidebar { background-color: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column;
+            gap: 15px; align-items: center; height: fit-content; }
+    .main-content { background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); text-align: center; 
+            box-sizing: border-box; }
+    h2 { color: #007bff; margin-bottom: 10px; font-size: 1.5em; }
+    p { color: #666; margin-bottom: 15px; line-height: 1.5; }
+    .control-group { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 10px; }
+    .control-group label { font-weight: bold; color: #555; font-size: 0.9em; }
+    .control-group input[type="number"] { padding: 8px; border: 1px solid #ced4da; border-radius: 6px; width: 80px; text-align: center; }
+    .sidebar button { width: 90%; padding: 10px 15px; border: none; border-radius: 6px; font-size: 0.9em; font-weight: bold; cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s; margin-top: 1px; }
+    #generateBtn { background-color: #28a745; color: white; }
+    #generateBtn:hover { background-color: #218838; transform: translateY(-1px); }
+    #solveBtn { background-color: #007bff; color: white; }
+    #solveBtn:hover:not(:disabled) { background-color: #0056b3; transform: translateY(-1px); }
+    #solveBtn:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.7; }
+    #resetBtn { background-color: #dc3545; color: white; }
+    #resetBtn:hover { background-color: #c82333; transform: translateY(-1px); }
+    .results { margin-top: 20px; padding: 15px; background-color: #e6f2ff; border: 1px solid #cce0ff; border-radius: 8px; font-size: 1.1em; font-weight: bold;
+            color: #0056b3; }
+    .results span { color: #003366; }
+    #envelopePool { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; min-height: 100px; padding: 20px; border: 2px dashed #a7d9ff;
+            background-color: #f8fbff; border-radius: 10px; margin-top: 20px; box-sizing: border-box; }
+    #nestingArea { display: flex; flex-direction: column; align-items: center; min-height: 150px; padding: 20px; border: 2px dashed #ccc; background-color: #fcfcfc;
+            border-radius: 10px; margin-top: 20px; box-sizing: border-box; position: relative; justify-content: flex-end; min-width: 150px; }
+    #nestingArea.drag-over { border-color: #007bff; background-color: #e6f2ff; }
+    .envelope-item { background-color: #ffcc00; border: 1px solid #e6b800; position: relative; box-sizing: border-box; cursor: grab; display: flex; 
+            justify-content: center; align-items: center; font-size: 0.8em; font-weight: bold; color: #333; border-radius: 3px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.1s ease; }
+    .envelope-item:active { cursor: grabbing; }
+    .envelope-item.dragging { opacity: 0.6; border: 2px dashed #007bff; background-color: #a4d2ff; z-index: 1000; }
+    .envelope-item.nested { margin: -10px auto 0; position: relative; background-color: #4CAF50; border-color: #388E3C; color: white; cursor: default;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .envelope-item.optimal { background-color: #17a2b8!important; border-color: #138496!important; color: #fff!important; 
+            box-shadow: 0 0 0 4px rgba(23, 162, 184, 0.5)!important; transform: scale(1.05); z-index: 100; }
+    .highlight-fit { border: 2px solid #28a745!important; box-shadow: 0 0 8px rgba(40, 167, 69, 0.5); }
+    .highlight-no-fit { border: 2px solid #dc3545!important; box-shadow: 0 0 8px rgba(220, 53, 69, 0.5); }
+@media (max-width: 768px) {
+    body { grid-template-columns: 1fr; gap: 15px; padding: 15px; }
+    .sidebar { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 15px; }
+    .control-group { flex-direction: row; justify-content: center; margin-bottom: 0; }
+    .sidebar button { width: auto; flex-grow: 1; margin-top: 0; }
+    .main-content { padding: 20px; }
+    .results { font-size: 1em; }
+}
+</style>
 </head>
 <body>
     <div class="sidebar">
@@ -266,7 +87,6 @@
     <script>
         let allEnvelopesData = []; 
         let userNestedChain = [];
-
         const numEnvelopesInput = document.getElementById('numEnvelopes');
         const maxSizeInput = document.getElementById('maxSize');
         const generateBtn = document.getElementById('generateBtn');
@@ -276,7 +96,6 @@
         const nestingArea = document.getElementById('nestingArea');
         const userNestingCountSpan = document.getElementById('userNestingCount');
         const algoNestingCountSpan = document.getElementById('algoNestingCount');
-
         function sortEnvelopesForLIS(envelopes) {
             return [...envelopes].sort((a, b) => {
                 if (a.w!== b.w) {
@@ -292,10 +111,8 @@
             const n = sortedEnvelopes.length;
             const dp = Array(n).fill(1);
             const pathTracker = Array(n).fill(-1);
-
             let overallMax = 0;
             let lastIndex = -1;
-
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < i; j++) {
                     if (sortedEnvelopes[i].w > sortedEnvelopes[j].w && sortedEnvelopes[i].h > sortedEnvelopes[j].h) {
@@ -329,7 +146,6 @@
                 alert('Please enter valid numbers: Envelopes (2-50), Max Dimension (50-300px).');
                 return;
             }
-
             envelopePool.innerHTML = '';
             nestingArea.innerHTML = '';
             allEnvelopesData = [];
@@ -337,12 +153,10 @@
             updateUserNestingDisplay();
             algoNestingCountSpan.textContent = '0';
             solveBtn.disabled = false;
-
             for (let i = 0; i < num; i++) {
                 const w = Math.floor(Math.random() * (maxDim - 20)) + 20;
                 const h = Math.floor(Math.random() * (maxDim - 20)) + 20;
                 const id = `env-${i}`;
-                
                 const envelopeDiv = document.createElement('div');
                 envelopeDiv.className = 'envelope-item';
                 envelopeDiv.id = id;
@@ -352,7 +166,6 @@
                 envelopeDiv.draggable = true;
                 envelopeDiv.dataset.width = w;
                 envelopeDiv.dataset.height = h;
-
                 envelopePool.appendChild(envelopeDiv);
                 allEnvelopesData.push({ id, w, h, element: envelopeDiv });
             }
@@ -381,11 +194,9 @@
             e.preventDefault();
             const draggedId = e.dataTransfer.getData('text/plain');
             const draggedEnvelope = allEnvelopesData.find(env => env.id === draggedId);
-            
             if (draggedEnvelope) {
                 nestingArea.classList.add('drag-over');
                 const lastNested = userNestedChain[userNestedChain.length - 1];
-
                 if (userNestedChain.length === 0 || (draggedEnvelope.w > lastNested.w && draggedEnvelope.h > lastNested.h)) {
                     document.getElementById(draggedId).classList.add('highlight-fit');
                     document.getElementById(draggedId).classList.remove('highlight-no-fit');
@@ -447,7 +258,6 @@
 
             const currentPool = allEnvelopesData.filter(env =>!env.element.classList.contains('nested'));
             const combinedEnvelopes = [...userNestedChain,...currentPool];
-
             const optimalIds = getLISPath(combinedEnvelopes);
             algoNestingCountSpan.textContent = optimalIds.length;
 
@@ -460,9 +270,7 @@
             });
             solveBtn.disabled = true;
         });
-
         generateEnvelopes();
     </script>
 </body>
 </html>
-
