@@ -72,7 +72,6 @@
     </div>
     <div class="main-content">
         <p>Drag and drop envelopes into the nesting area to build your own sequence. An envelope only fits if both its width and height are strictly greater than the one it's dropped onto.</p>
-        
         <div class="results">
             Your Nested Envelopes: <span id="userNestingCount">0</span> (<span id="userNestingSequence"></span>) <br>
             Algorithm's Max Nesting: <span id="algoNestingCount">0</span>
@@ -104,7 +103,6 @@
                 return b.h - a.h;
             });
         }
-
         function getLISPath(envelopes) {
             if (envelopes.length === 0) return [];
             const sortedEnvelopes = sortEnvelopesForLIS(envelopes);
@@ -127,7 +125,6 @@
                     lastIndex = i;
                 }
             }
-            
             let optimalPath = [];
             if (lastIndex!== -1) {
                 let current = lastIndex;
@@ -138,7 +135,6 @@
             }
             return optimalPath;
         }
-
         function generateEnvelopes() {
             const num = parseInt(numEnvelopesInput.value);
             const maxDim = parseInt(maxSizeInput.value);
@@ -170,16 +166,13 @@
                 allEnvelopesData.push({ id, w, h, element: envelopeDiv });
             }
         }
-
         function updateUserNestingDisplay() {
             userNestingCountSpan.textContent = userNestedChain.length;
             const sequenceText = userNestedChain.map(env => `[${env.w},${env.h}]`).join(' → ');
             userNestingCountSpan.nextElementSibling.textContent = sequenceText;
         }
-
         generateBtn.addEventListener('click', generateEnvelopes);
         resetBtn.addEventListener('click', generateEnvelopes);
-
         envelopePool.addEventListener('dragstart', e => {
             if (e.target.classList.contains('envelope-item') &&!e.target.classList.contains('nested') &&!e.target.classList.contains('optimal')) {
                 e.target.classList.add('dragging');
@@ -189,7 +182,6 @@
                 e.preventDefault();
             }
         });
-
         nestingArea.addEventListener('dragover', e => {
             e.preventDefault();
             const draggedId = e.dataTransfer.getData('text/plain');
@@ -206,7 +198,6 @@
                 }
             }
         });
-
         nestingArea.addEventListener('dragleave', e => {
             nestingArea.classList.remove('drag-over');
             const draggedId = e.dataTransfer.getData('text/plain');
@@ -215,21 +206,16 @@
                 draggedElement.classList.remove('highlight-fit', 'highlight-no-fit');
             }
         });
-
         nestingArea.addEventListener('drop', e => {
             e.preventDefault();
             nestingArea.classList.remove('drag-over');
             const draggedId = e.dataTransfer.getData('text/plain');
             const draggedEnvelopeElement = document.getElementById(draggedId);
             const draggedEnvelopeData = allEnvelopesData.find(env => env.id === draggedId);
-            
             if (!draggedEnvelopeData) return;
-
             draggedEnvelopeElement.classList.remove('dragging', 'highlight-fit', 'highlight-no-fit');
-
             const lastNested = userNestedChain[userNestedChain.length - 1];
             const canFit = userNestedChain.length === 0 || (draggedEnvelopeData.w > lastNested.w && draggedEnvelopeData.h > lastNested.h);
-
             if (canFit) {
                 draggedEnvelopeElement.classList.add('nested');
                 draggedEnvelopeElement.draggable = false;
@@ -240,14 +226,12 @@
                 alert(`Envelope [${draggedEnvelopeData.w}x${draggedEnvelopeData.h}] cannot fit! It must be strictly wider and taller than the last nested envelope [${lastNested.w}x${lastNested.h}].`);
             }
         });
-
         document.body.addEventListener('dragend', e => {
             const draggedElement = document.querySelector('.dragging');
             if (draggedElement) {
                 draggedElement.classList.remove('dragging', 'highlight-fit', 'highlight-no-fit');
             }
         });
-
         solveBtn.addEventListener('click', () => {
             document.querySelectorAll('.envelope-item').forEach(env => {
                 env.classList.remove('optimal');
@@ -255,12 +239,10 @@
                     env.draggable = true;
                 }
             });
-
             const currentPool = allEnvelopesData.filter(env =>!env.element.classList.contains('nested'));
             const combinedEnvelopes = [...userNestedChain,...currentPool];
             const optimalIds = getLISPath(combinedEnvelopes);
             algoNestingCountSpan.textContent = optimalIds.length;
-
             optimalIds.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) {
