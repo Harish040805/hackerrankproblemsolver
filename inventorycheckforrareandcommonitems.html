@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏺 Inventory Check for Rare and Common Items</title>
+<style>
+    :root {
+        --bg-color: #7dd4ff;
+        --panel-bg: #ffffff;
+        --border-color: #e2e8f0;
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --btn-bg: #0284c7;
+        --btn-hover: #00689c;
+        --rare-color: #7c3aed;
+        --rare-bg: #f5f3ff;
+        --common-color: #0284c7;
+        --common-bg: #f0f9ff;
+        --premium-color: #ca8a04;
+        --premium-bg: #fefce8;
+        --regular-color: #475569;
+        --regular-bg: #f8fafc;
+    }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 40px 20px;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+    .container {
+        background-color: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 40px;
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+    }
+    .info-container {
+        background-color: var(--panel-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 30px;
+        width: 100%;
+        max-width: 380px;
+        text-align: left;
+    }
+    .info-container h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 8px;
+    }
+    .info-container h3 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-top: 16px;
+        margin-bottom: 6px;
+    }
+    .info-container p {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+    .info-container ul {
+        padding-left: 20px;
+        margin-bottom: 12px;
+    }
+    .info-container li {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        margin-bottom: 4px;
+    }
+    h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+    }
+    .subtitle {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 24px;
+    }
+    .input-group {
+        margin-bottom: 16px;
+    }
+    input[type="number"] {
+        width: 100%;
+        padding: 12px;
+        background-color: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        text-align: center;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+    input[type="number"]:focus {
+        border-color: var(--text-primary);
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: var(--btn-bg);
+        border: none;
+        border-radius: 6px;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    button:hover {
+        background-color: var(--btn-hover);
+    }
+    .result-card {
+        margin-top: 24px;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #ffffff;
+        border: 1px solid var(--border-color);
+        display: none;
+    }
+    .result-card.show {
+        display: block;
+    }
+    .badge {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        margin-bottom: 16px;
+    }
+    .rare-badge {
+        background-color: var(--rare-bg);
+        color: var(--rare-color);
+        border: 1px solid #ddd6fe;
+    }
+    .common-badge {
+        background-color: var(--common-bg);
+        color: var(--common-color);
+        border: 1px solid #bae6fd;
+    }
+    .premium-badge {
+        background-color: var(--premium-bg);
+        color: var(--premium-color);
+        border: 1px solid #fef08a;
+    }
+    .regular-badge {
+        background-color: var(--regular-bg);
+        color: var(--regular-color);
+        border: 1px solid #e2e8f0;
+    }
+    .badge-container {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
+    .visualization {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+    .math-node {
+        background-color: #f1f5f9;
+        border: 1px solid var(--border-color);
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: var(--text-primary);
+    }
+    .math-total {
+        width: 100%;
+        margin-top: 12px;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        border-top: 1px dashed var(--border-color);
+        padding-top: 12px;
+    }
+    .highlight-val {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+    .clearbtn {
+        flex: 1; 
+        background-color: #ffc107;
+    }
+    .clearbtn:hover {
+        flex: 1; 
+        background-color: #e0aa07;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏺 Inventory Check for<br>Rare and Common Items</h1>
+        <p class="subtitle">Enter an Item ID below to evaluate its architectural rarity status.</p>
+        <div class="input-group">
+            <input type="number" id="itemIdInput" placeholder="Enter Item ID (e.g., 145)" min="0">
+        </div>
+        <div style="display: flex; gap: 12px; width: 100%;">
+            <button onclick="checkInventory()" style="flex: 1;">🧐 Analyze Item Status</button>
+            <button class="clearbtn">🟨 Clear</button>
+        </div>
+        <div id="resultCard" class="result-card">
+            <div class="badge-container">
+                <div id="statusBadge" class="badge"></div>
+                <div id="primeBadge" class="badge"></div>
+            </div>
+            <div class="visualization" id="calcBreakdown"></div>
+            <div class="math-total" id="mathTotal"></div>
+        </div>
+    </div>
+
+    <div class="info-container">
+        <h2>📓 About</h2>
+        <p>👤 This tool evaluates any product or item ID you enter to check two distinct mathematical properties at the same time: if it is a Strong Number and if it is a Prime Number. <br>👤 Based on these checks, it labels the item under one of four unique categories.</p>
+        
+        <h3>"🐦‍🔥 Rare Item vs Common Item 🧻</h3>
+        <p>"<b>🐦‍🔥 Rare Item:</b> A number where the factorials of its separate digits add up to the number itself. For example, with 145, calculating $1! + 4! + 5!$ gives $1 + 24 + 120 = 145$.</p>
+        <p><b>🧻 Common Item:</b> Any number where the digit factorials do not add up to the original number.</p>
+        
+        <h3>👑 Premium Item vs Regular Item 📂</h3>
+        <p><b>👑 Premium Product:</b> A number greater than 1 that cannot be divided evenly by any other number except 1 and itself (like 2, 3, 5, 7, 11, or 17).</p>
+        <p><b>📂 Regular Product:</b> Any number that has other divisors, or the number 1.</p>
+    </div>
+
+    <div class="info-container">
+        <h2>📑 Instructions</h2>
+        <ul>
+            <li><strong>Step 1:</strong> Enter any whole number greater than or equal to 0 into the input box.</li>
+            <li><strong>Step 2:</strong> Click the Analyze Item Status button.</li>
+            <li><strong>Step 3:</strong> View your results instantly. The page will show the calculation breakdown and display two color-coded badges indicating the item's exact category combination right below.</li>
+        </ul>
+    </div>
+    <script>
+function factorial(num) {
+            let fact = 1;
+            for (let i = 1; i <= num; i++) {
+                fact *= i;
+            }
+            return fact;
+        }
+
+        function isPrime(num) {
+            if (num <= 1) return false;
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+
+        function checkInventory() {
+            const inputElement = document.getElementById('itemIdInput');
+            const resultCard = document.getElementById('resultCard');
+            const statusBadge = document.getElementById('statusBadge');
+            const primeBadge = document.getElementById('primeBadge');
+            const calcBreakdown = document.getElementById('calcBreakdown');
+            const mathTotal = document.getElementById('mathTotal');
+
+            const inputValue = inputElement.value.trim();
+
+            if (inputValue === '') {
+                alert('Please enter a valid Item ID first.');
+                return;
+            }
+
+            const originalNumber = parseInt(inputValue, 10);
+            
+            if (originalNumber < 0) {
+                alert('Item ID must be a non-negative integer.');
+                return;
+            }
+
+            let temp = originalNumber;
+            let sum = 0;
+            let breakdownHtml = '';
+
+            if (temp === 0) {
+                let factVal = factorial(0);
+                sum += factVal;
+                breakdownHtml += `<div class="math-node">0! = ${factVal}</div>`;
+            } else {
+                let digits = [];
+                while (temp > 0) {
+                    digits.push(temp % 10);
+                    temp = Math.floor(temp / 10);
+                }
+                digits.reverse();
+
+                for (let i = 0; i < digits.length; i++) {
+                    let d = digits[i];
+                    let factVal = factorial(d);
+                    sum += factVal;
+                    breakdownHtml += `<div class="math-node">${d}! = ${factVal}</div>`;
+                }
+            }
+
+        const isStrong = (sum === originalNumber);
+            const isPremium = isPrime(originalNumber);
+
+            calcBreakdown.innerHTML = breakdownHtml;
+
+            if (isStrong) {
+                statusBadge.className = "badge rare-badge";
+                statusBadge.innerText = "🐦‍🔥 Rare Item";
+                mathTotal.innerHTML = `Factorial Sum: <span class="highlight-val">${sum}</span> == Item ID: <span class="highlight-val">${originalNumber}</span>`;
+            } else {
+                statusBadge.className = "badge common-badge";
+                statusBadge.innerText = "🧻 Common Item";
+                mathTotal.innerHTML = `Factorial Sum: <span class="highlight-val">${sum}</span> != Item ID: <span class="highlight-val">${originalNumber}</span>`;
+            }
+
+            if (isPremium) {
+                primeBadge.className = "badge premium-badge";
+                primeBadge.innerText = "👑 Premium Product";
+            } else {
+                primeBadge.className = "badge regular-badge";
+                primeBadge.innerText = "📂 Regular Product";
+            }
+
+            resultCard.style.display = "block";
+            setTimeout(() => {
+                resultCard.classList.add('show');
+            }, 10);
+        }
+    </script>
+</body>
+</html>
