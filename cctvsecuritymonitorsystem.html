@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCTV Security Monitor System</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: #080b11;
+            background-image: 
+                radial-gradient(rgba(16, 24, 48, 0.9), rgba(4, 6, 12, 1)),
+                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            color: #00ff66;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Ambient Office Glow Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* CCTV Workspace Container - Fixed Width */
+        .security-station {
+            width: 100%;
+            max-width: 900px;
+            background: #151a22;
+            border: 4px solid #2c3545;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.6);
+        }
+
+        .station-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed #2c3545;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #ff3333;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: blink 1.5s infinite;
+            box-shadow: 0 0 10px #ff3333;
+        }
+
+        /* The CRT Monitor Screen */
+        .monitor-screen {
+            background: #031408;
+            border: 20px solid #222a36;
+            border-radius: 30px;
+            padding: 25px;
+            position: relative;
+            box-shadow: inset 0 0 40px rgba(0,0,0,1), 0 0 30px rgba(0, 255, 102, 0.15);
+            overflow: hidden;
+        }
+
+        /* Reduced Normal Fixed Height Inner Container with Scrolling Content Area */
+        .camera-view {
+            border: 1px solid rgba(0, 255, 102, 0.2);
+            padding: 55px 20px 20px 20px;
+            background: linear-gradient(135deg, rgba(5, 25, 12, 0.9) 0%, rgba(2, 10, 5, 0.95) 100%);
+            border-radius: 8px;
+            position: relative;
+            height: 380px;
+            overflow-y: auto;
+        }
+
+        /* Styling scrollbar for retro theme integration */
+        .camera-view::-webkit-scrollbar {
+            width: 8px;
+        }
+        .camera-view::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .camera-view::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 102, 0.3);
+            border-radius: 4px;
+        }
+        .camera-view::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 102, 0.6);
+        }
+
+        .camera-view::after {
+            content: "CAM 01 - NORTH WING OUTSIDE";
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        .timestamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Form & Grid Interface */
+        .interface-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 650px) {
+            .interface-grid { grid-template-columns: 1fr; }
+        }
+
+        .panel-section {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px dashed rgba(0, 255, 102, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .panel-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            color: #88ffaa;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: #020a04;
+            border: 1px solid #00ff66;
+            color: #00ff66;
+            padding: 12px;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            resize: none;
+            outline: none;
+            border-radius: 4px;
+            box-shadow: inset 0 0 10px rgba(0,255,102,0.2);
+        }
+
+        textarea:focus {
+            box-shadow: inset 0 0 15px rgba(0,255,102,0.4), 0 0 10px rgba(0,255,102,0.3);
+        }
+
+        .output-box {
+            width: 100%;
+            height: 120px;
+            background: #010602;
+            border: 1px dashed rgba(0, 255, 102, 0.5);
+            color: #33ff88;
+            padding: 12px;
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+
+        /* Internal Help Box Panel */
+        .help-panel {
+            display: none;
+            margin-top: 20px;
+            background: rgba(12, 25, 16, 0.85);
+            border: 1px dashed #00ff66;
+            border-radius: 6px;
+            padding: 20px;
+            box-shadow: inset 0 0 15px rgba(0, 255, 102, 0.1);
+        }
+
+        .help-panel h3 {
+            font-size: 1rem;
+            color: #00ff66;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 102, 0.3);
+            padding-bottom: 6px;
+        }
+
+        .help-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 25px;
+        }
+
+        @media (max-width: 650px) {
+            .help-grid { grid-template-columns: 1fr; }
+        }
+
+        .help-item p {
+            font-size: 0.8rem;
+            color: #a3ffd0;
+            line-height: 1.4;
+            margin-top: 4px;
+        }
+
+        .help-item strong {
+            font-size: 0.85rem;
+            color: #00ff66;
+            text-transform: uppercase;
+        }
+
+        /* Controls */
+        .btn-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        button {
+            background: #00ff66;
+            color: #031408;
+            border: none;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.4);
+        }
+
+        button:hover {
+            background: #4eff98;
+        }
+
+        button.btn-secondary {
+            background: #1a2332;
+            color: #00ff66;
+            border: 1px solid #2c3545;
+            box-shadow: none;
+        }
+
+        button.btn-secondary:hover {
+            background: #2c3545;
+            color: #4eff98;
+        }
+
+        /* Animations */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        /* Crosshair graphic element to sell the CCTV aesthetic */
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            opacity: 0.2;
+            pointer-events: none;
+        }
+        .crosshair::before, .crosshair::after {
+            content: '';
+            position: absolute;
+            background: #00ff66;
+        }
+        .crosshair::before { top: 14px; left: 0; width: 30px; height: 2px; }
+        .crosshair::after { left: 14px; top: 0; width: 2px; height: 30px; }
+
+    </style>
+</head>
+<body>
+<div class="security-station">
+    <div class="station-header">
+        <h2>MAIN_FRAME SECURITY INTERFACES v4.82</h2>
+        <div>
+            <span class="status-dot"></span>
+            <span>REC LIVE</span>
+        </div>
+    </div>
+
+    <div class="monitor-screen">
+        <div class="camera-view">
+            <div class="timestamp" id="live-clock">00:00:00</div>
+            <div class="crosshair"></div>
+            
+            <div id="interfaceGrid" class="interface-grid">
+                <div class="panel-section">
+                    <label class="panel-label" for="matrixInput">> ENTER IMAGE MATRIX</label>
+                    <textarea id="matrixInput" placeholder="1 1 0&#10;1 0 1&#10;0 0 0" spellcheck="false" oninput="processImage()"></textarea>
+                    <p style="font-size: 0.75rem; margin-top: 5px; opacity: 0.6;">Use 0 and 1 separated by spaces. Row by row.</p>
+                </div>
+
+                <div class="panel-section">
+                    <label class="panel-label">> MATRIX TRANSFORMATION PROCESSED| FLIPPED AND INVERTED</label>
+                    <div id="matrixOutput" class="output-box">1 0 0&#10;0 1 0&#10;1 1 1</div>
+                    <p style="font-size: 0.75rem; margin-top: 5px; opacity: 0.6; color: #ffaa00;">Status: DECRYPTED & INVERTED</p>
+                </div>
+            </div>
+
+            <div id="helpPanel" class="help-panel">
+                <h3>// MONITOR CONSOLE MANUAL & SYSTEM INFO</h3>
+                <div class="help-grid">
+                    <div class="help-item">
+                        <strong>Game Objective:</strong>
+                        <p>Simulates a CCTV Security terminal script. It decrypts corrupted camera image segments (binary matrices) by deploying systemic corrections.</p>
+                    </div>
+                    <div class="help-item">
+                        <strong>Operational Use:</strong>
+                        <p>Change sequences inside the input box. The terminal updates live data automatically, or manually via the refresh action sequence.</p>
+                    </div>
+                    <div class="help-item">
+                        <strong>Input Syntax:</strong>
+                        <p>Add only '0' and '1' items separate by a space. Hit Return/Enter to split matrix lines uniformly.</p>
+                    </div>
+                    <div class="help-item">
+                        <strong>Validation Verification:</strong>
+                        <p>The processing architecture applies a reverse horizontally, and swaps '1's into '0's (and vice-versa). Check alignment output matches calculation rules.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn-secondary" id="helpBtn" onclick="toggleHelpBox()">Show Help</button>
+                <button id="refreshBtn" onclick="processImage()">Execute Refresh</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Screen Toggle Logic (Ensures only one view displays at a time)
+    function toggleHelpBox() {
+        const panel = document.getElementById('helpPanel');
+        const grid = document.getElementById('interfaceGrid');
+        const helpBtn = document.getElementById('helpBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        
+        if (panel.style.display === 'block') {
+            panel.style.display = 'none';
+            grid.style.display = 'grid';
+            helpBtn.textContent = 'Show Help';
+            refreshBtn.style.visibility = 'visible';
+        } else {
+            panel.style.display = 'block';
+            grid.style.display = 'none';
+            helpBtn.textContent = 'Hide Help';
+            refreshBtn.style.visibility = 'hidden';
+        }
+    }
+
+    // Live Matrix Image Processor Logic
+    function processImage() {
+        const inputVal = document.getElementById('matrixInput').value.trim();
+        const outputElement = document.getElementById('matrixOutput');
+        
+        if (!inputVal) {
+            outputElement.textContent = "AWAITING DATA...";
+            return;
+        }
+
+        try {
+            const lines = inputVal.split('\n');
+            let resultMatrix = [];
+
+            for (let line of lines) {
+                let row = line.trim().split(/\s+/).filter(el => el !== "");
+                if (row.length === 0) continue;
+
+                // Step 1: Flip Horizontally
+                row.reverse();
+
+                // Step 2: Invert (0 -> 1, 1 -> 0)
+                let processedRow = row.map(pixel => {
+                    if (pixel === '0') return '1';
+                    if (pixel === '1') return '0';
+                    return '?';
+                });
+
+                resultMatrix.push(processedRow.join(' '));
+            }
+
+            outputElement.textContent = resultMatrix.join('\n');
+        } catch (error) {
+            outputElement.textContent = "ERROR: INVALID MATRIX SYNTAX";
+        }
+    }
+
+    // Dynamic Clock script for CCTV realism 
+    function updateClock() {
+        const now = new Date();
+        const timeStr = now.toTimeString().split(' ')[0];
+        document.getElementById('live-clock').textContent = timeStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Seed sample values on load
+    document.getElementById('matrixInput').value = "1 1 0\n1 0 1\n0 0 0";
+    processImage();
+</script>
+
+</body>
+</html>
